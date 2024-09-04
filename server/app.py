@@ -61,17 +61,56 @@ class OneEpisode(Resource):
 api.add_resource(OneEpisode, '/episodes/<int:id>')
 
 class AllGuests(Resource):
-     def get(self):
-         guests = Guest.query.all()
-         docs_list = [g.to_dict(only=('id', 'name', 'occupation')) for g in guests]
-         return make_response(docs_list, 200)
+    def get(self):
+        guests = Guest.query.all()
+        docs_list = [g.to_dict(only=('id', 'name', 'occupation')) for g in guests]
+        return make_response(docs_list, 200)
 
 api.add_resource(AllGuests, '/guests')
 
+class CreateAppearance(Resource):
+    def post(self):
+
+        data = request.get_json()
+
+        rating = data.get('rating')
+        episode_id = data.get('episode_id')
+        guest_id = data.get('guest_id')
+
+        
+        if not (1 <= rating <= 5):
+            raise ValueError('Raing must be between 1 and 5')
+
+        episode = Episode.query.get(episode_id)
+        guest = Guest.query.get(guest_id)
+
+        if episode and guest:
+            new_app = Appearance(rating=rating, episode_id=episode_id, guest_id=guest_id)
+            db.session.add(new_app)
+            db.session.commit()
+
+            appearance_dict = {
+                "id": new_app.id,
+                "rating": new_app.rating,
+                "episode_id": episode.id,
+                "guest_id": guest.id,
+                "episode": {
+                    "id": episode.id,
+                    "date": episode.date,
+                    "number": episode.number
+                },
+                "guest": {
+                    "id": guest.id,
+                    "name": guest.name,
+                    "occupation": guest.occupation
+                }
+            }
+            return make_response(appearance_dict, 201)
+        else:
+            return make_response({"error": "400: Validation error."}, 400)
 
 
-
-
+api.add_resource(CreateAppearance, '/appearances')
 
 
 if __name__ == "__main__":

@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from marshmallow import ValidationError
 from sqlalchemy import MetaData, ForeignKey
 from sqlalchemy.orm import validates
 from sqlalchemy.ext.associationproxy import association_proxy
@@ -48,10 +49,18 @@ class Appearance(db.Model, SerializerMixin):
     episode = db.relationship('Episode', back_populates='appearances')
     guest = db.relationship('Guest', back_populates='appearances')
 
+    @validates('rating')
+    def validate_rating(self, key, app_rating):
+        if not (1 <= app_rating <= 5):
+            raise ValueError('400: Validation error.')
+        return app_rating
+
     serialize_rules = ('-episode.appearances', '-guest.appearances')
 
-def __repr__(self):
-        return f'<Appearance {self.id}>'
+
+
+    def __repr__(self):
+        return f'<Appearance {self.id} {self.rating} {self.episode_id} {self.guest_id} >'
 
 class Guest(db.Model, SerializerMixin):
     __tablename__ = 'guests'
