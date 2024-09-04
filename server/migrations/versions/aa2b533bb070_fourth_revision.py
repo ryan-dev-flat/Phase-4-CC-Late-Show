@@ -1,8 +1,8 @@
-"""first revision
+"""fourth revision
 
-Revision ID: 4d5815ab96b9
+Revision ID: aa2b533bb070
 Revises: 
-Create Date: 2024-09-04 10:14:47.860511
+Create Date: 2024-09-04 12:36:21.106805
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '4d5815ab96b9'
+revision = 'aa2b533bb070'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -21,6 +21,7 @@ def upgrade():
     op.create_table('episodes',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('date', sa.String(), nullable=True),
+    sa.Column('number', sa.String(), nullable=True),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id')
